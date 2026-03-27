@@ -1,112 +1,35 @@
-CREATE TABLE amr.amr_code
-(
-   code_id        numeric(22)    NOT NULL,
-   code_group_fk  numeric(22),
-   code           varchar(255),
-   valid_from     date,
-   valid_to       date
-);
-
-ALTER TABLE amr.amr_code
-  ADD CONSTRAINT pk_code PRIMARY KEY (code_id);
-
-CREATE INDEX amr.code_indx_1
-   ON amr.amr_code (code ASC);
-
-CREATE INDEX amr.code_indx_3
-   ON amr.amr_code (code_group_fk ASC, code ASC);
-
-CREATE INDEX amr.code_indx_2
-   ON amr.amr_code (code_group_fk ASC);
-
-COMMENT ON TABLE amr.amr_code IS 'Kódtábla';
-COMMENT ON COLUMN amr.amr_code.code_id IS 'Egyedi azonosító';
-COMMENT ON COLUMN amr.amr_code.code_group_fk IS 'Kód csoport azonosító';
-COMMENT ON COLUMN amr.amr_code.code IS 'Kód';
-COMMENT ON COLUMN amr.amr_code.valid_from IS 'Érvényesség kezdete';
-COMMENT ON COLUMN amr.amr_code.valid_to IS 'Érvényesség vége';
-
-GRANT DELETE, SELECT, UPDATE, INSERT ON amr.amr_code TO methodus_proxy;
-GRANT UPDATE, DELETE, SELECT, INSERT ON amr.amr_code TO amr_proxy;
-GRANT REFERENCES, SELECT, TRIGGER, DELETE, TRUNCATE, INSERT, UPDATE ON amr.amr_code TO amr;
-GRANT SELECT ON amr.amr_code TO methodus;
-GRANT SELECT ON amr.amr_code TO amr_db_readonly;
-
-
-ALTER TABLE amr_code
-  ADD CONSTRAINT fk_amr_code_group FOREIGN KEY (code_group_fk)
-  REFERENCES amr.amr_code_group (code_group_id) 
-  ON UPDATE NO ACTION
-  ON DELETE NO ACTION;
-
-CREATE TABLE amr.amr_code_group
-(
-   code_group_id   numeric(22)    NOT NULL,
-   designation     varchar(255),
-   is_editable_fl  bool
-);
-
-ALTER TABLE amr.amr_code_group
-  ADD CONSTRAINT pk_code_group PRIMARY KEY (code_group_id);
-
-COMMENT ON TABLE amr.amr_code_group IS 'Kód csoport tábla';
-COMMENT ON COLUMN amr.amr_code_group.code_group_id IS 'Egyedi azonosító';
-COMMENT ON COLUMN amr.amr_code_group.designation IS 'Leírás';
-COMMENT ON COLUMN amr.amr_code_group.is_editable_fl IS 'Szerkeszthetõ? (1: igen, 0: nem)';
-
-GRANT DELETE, UPDATE, SELECT, INSERT ON amr.amr_code_group TO methodus_proxy;
-GRANT UPDATE, DELETE, SELECT, INSERT ON amr.amr_code_group TO amr_proxy;
-GRANT REFERENCES, SELECT, TRIGGER, DELETE, TRUNCATE, INSERT, UPDATE ON amr.amr_code_group TO amr;
-GRANT SELECT ON amr.amr_code_group TO amr_db_readonly;
-
-CREATE TABLE amr.amr_code_languages
-(
-   code_languages_id  numeric(22)    NOT NULL,
-   name               varchar(255),
-   locale_name        varchar(255)
-);
-
-ALTER TABLE amr.amr_code_languages
-  ADD CONSTRAINT pk_code_languages PRIMARY KEY (code_languages_id);
-
-COMMENT ON TABLE amr.amr_code_languages IS 'Kód nyelvi tábla';
-COMMENT ON COLUMN amr.amr_code_languages.code_languages_id IS 'Egyedi azonosító';
-COMMENT ON COLUMN amr.amr_code_languages.name IS 'Nyelv neve';
-COMMENT ON COLUMN amr.amr_code_languages.locale_name IS 'Nyelv lokális azonosítója';
-
-GRANT DELETE, UPDATE, SELECT, INSERT ON amr.amr_code_languages TO methodus_proxy;
-GRANT UPDATE, DELETE, SELECT, INSERT ON amr.amr_code_languages TO amr_proxy;
-GRANT REFERENCES, SELECT, TRIGGER, DELETE, TRUNCATE, INSERT, UPDATE ON amr.amr_code_languages TO amr;
-GRANT SELECT ON amr.amr_code_languages TO amr_db_readonly;
-
-
 CREATE TABLE amr.amr_code_values
-(
-   lang_fk  numeric(22)     NOT NULL,
-   code_fk  numeric(22)     NOT NULL,
-   value    varchar(4000)
-);
-
-ALTER TABLE amr.amr_code_values
-  ADD CONSTRAINT pk_code_values PRIMARY KEY (lang_fk, code_fk);
-
-COMMENT ON TABLE amr.amr_code_values IS 'Kód értékek';
-COMMENT ON COLUMN amr.amr_code_values.lang_fk IS 'Kód nyelvi azonosító';
-COMMENT ON COLUMN amr.amr_code_values.code_fk IS 'Kód azonosító';
-COMMENT ON COLUMN amr.amr_code_values.value IS 'Érték';
-
-GRANT DELETE, SELECT, UPDATE, INSERT ON amr.amr_code_values TO methodus_proxy;
-GRANT UPDATE, DELETE, SELECT, INSERT ON amr.amr_code_values TO amr_proxy;
-GRANT REFERENCES, SELECT, TRIGGER, DELETE, TRUNCATE, INSERT, UPDATE ON amr.amr_code_values TO amr;
-GRANT SELECT ON amr.amr_code_values TO methodus;
-GRANT SELECT ON amr.amr_code_values TO amr_db_readonly;
-
-
+    code_fk  numeric(22)     NOT NULL,
+    value    varchar(4000)
+ );
+ 
+ ALTER TABLE amr.amr_code_values
+   ADD CONSTRAINT pk_code_values PRIMARY KEY (lang_fk, code_fk);
+ 
+ COMMENT ON TABLE amr.amr_code_values IS 'Kód értékek';
+ COMMENT ON COLUMN amr.amr_code_values.lang_fk IS 'Kód nyelvi azonosító';
+ COMMENT ON COLUMN amr.amr_code_values.code_fk IS 'Kód azonosító';
+ COMMENT ON COLUMN amr.amr_code_values.value IS 'Érték';
+ 
+ GRANT DELETE, SELECT, UPDATE, INSERT ON amr.amr_code_values TO methodus_proxy;
+ GRANT UPDATE, DELETE, SELECT, INSERT ON amr.amr_code_values TO amr_proxy;
+ GRANT REFERENCES, SELECT, TRIGGER, DELETE, TRUNCATE, INSERT, UPDATE ON amr.amr_code_values TO amr;
+ GRANT SELECT ON amr.amr_code_values TO methodus;
+ GRANT SELECT ON amr.amr_code_values TO amr_db_readonly;
+ 
+ 
+ ALTER TABLE amr_code_values
+   ADD CONSTRAINT fk_amr_code_values_code FOREIGN KEY (code_fk)
+   REFERENCES amr.amr_code (code_id) 
+   ON UPDATE NO ACTION
+   ON DELETE NO ACTION;
+ 
 ALTER TABLE amr_code_values
-  ADD CONSTRAINT fk_amr_code_values_code FOREIGN KEY (code_fk)
-  REFERENCES amr.amr_code (code_id) 
+  ADD CONSTRAINT fk_amr_code_languages FOREIGN KEY (lang_fk)
+  REFERENCES amr.amr_code_languages (code_languages_id) 
   ON UPDATE NO ACTION
   ON DELETE NO ACTION;
+
 
 ALTER TABLE amr_code_values
   ADD CONSTRAINT fk_amr_code_languages FOREIGN KEY (lang_fk)
@@ -133,6 +56,10 @@ DECLARE
   v_current_value_hu varchar(4000);
   v_current_value_en varchar(4000);
   v_rows           integer;
+  v_total_count    integer := 0;
+  v_success_count  integer := 0;
+  v_failed_count   integer := 0;
+  v_error_text     text;
 BEGIN
   SELECT COALESCE(MAX(code_id), 0)
     INTO v_next_code_id
@@ -158,6 +85,10 @@ BEGIN
           -- , ('U'::char(1), 300::numeric(22), 'CODE_TO_UPDATE'::varchar(255), 'Frissítendő csoport'::varchar(255), 'Régi magyar érték'::varchar(4000), 'Old english value'::varchar(4000), 'Új magyar érték'::varchar(4000), 'New english value'::varchar(4000))
       ) AS t(op_type, code_group_fk, code, code_group_designation, check_value_hu, check_value_en, value_hu, value_en)
   LOOP
+    v_total_count := v_total_count + 1;
+    v_error_text := NULL;
+
+    BEGIN
     RAISE NOTICE '[TRACE] START ROW op_type=%, code_group_fk=%, code=%, check_hu=%, check_en=%, new_hu=%, new_en=%',
       v_rec.op_type, v_rec.code_group_fk, v_rec.code, v_rec.check_value_hu, v_rec.check_value_en, v_rec.value_hu, v_rec.value_en;
 
@@ -186,7 +117,7 @@ BEGIN
         FROM amr.amr_code c
        WHERE c.code_group_fk = v_rec.code_group_fk
          AND c.code = v_rec.code
-         AND (c.valid_to IS NULL OR c.valid_to > CURRENT_DATE)
+         AND c.valid_to > CURRENT_DATE
        ORDER BY c.valid_from DESC NULLS LAST, c.code_id DESC
        LIMIT 1;
       RAISE NOTICE '[TRACE] SELECT active code (D) -> code_group_fk=%, code=%, active_code_id=%',
@@ -230,7 +161,7 @@ BEGIN
          SET valid_to = CURRENT_DATE
        WHERE code_group_fk = v_rec.code_group_fk
          AND code = v_rec.code
-         AND (valid_to IS NULL OR valid_to > CURRENT_DATE);
+         AND valid_to > CURRENT_DATE;
       GET DIAGNOSTICS v_rows = ROW_COUNT;
       RAISE NOTICE '[TRACE] UPDATE D soft delete -> rows=%', v_rows;
 
@@ -262,7 +193,7 @@ BEGIN
         FROM amr.amr_code c
        WHERE c.code_group_fk = v_rec.code_group_fk
          AND c.code = v_rec.code
-         AND (c.valid_to IS NULL OR c.valid_to > CURRENT_DATE)
+         AND c.valid_to > CURRENT_DATE
        ORDER BY c.valid_from DESC NULLS LAST, c.code_id DESC
        LIMIT 1;
       RAISE NOTICE '[TRACE] SELECT active code (U) -> code_group_fk=%, code=%, active_code_id=%',
@@ -306,7 +237,7 @@ BEGIN
          SET valid_to = CURRENT_DATE
        WHERE code_group_fk = v_rec.code_group_fk
          AND code = v_rec.code
-         AND (valid_to IS NULL OR valid_to > CURRENT_DATE);
+         AND valid_to > CURRENT_DATE;
       GET DIAGNOSTICS v_rows = ROW_COUNT;
       RAISE NOTICE '[TRACE] UPDATE U soft delete -> rows=%', v_rows;
 
@@ -335,10 +266,19 @@ BEGIN
       RAISE EXCEPTION 'Ismeretlen művelettípus: % (engedélyezett: D, I, U)', v_rec.op_type;
     END IF;
 
-    RAISE NOTICE '[TRACE] END ROW op_type=%, code_group_fk=%, code=%',
+    v_success_count := v_success_count + 1;
+    RAISE NOTICE '[TRACE] END ROW op_type=%, code_group_fk=%, code=%, status=SUCCESS',
       v_rec.op_type, v_rec.code_group_fk, v_rec.code;
+    EXCEPTION
+      WHEN OTHERS THEN
+        v_failed_count := v_failed_count + 1;
+        v_error_text := SQLERRM;
+        RAISE NOTICE '[TRACE] END ROW op_type=%, code_group_fk=%, code=%, status=FAILED, error=%',
+          v_rec.op_type, v_rec.code_group_fk, v_rec.code, v_error_text;
+    END;
   END LOOP;
 
-  RAISE NOTICE '[TRACE] SCRIPT END';
+  RAISE NOTICE '[TRACE] SCRIPT END summary -> total=%, success=%, failed=%',
+    v_total_count, v_success_count, v_failed_count;
 END;
 $$;
